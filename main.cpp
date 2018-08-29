@@ -51,7 +51,7 @@ int main(void)
         glfwPollEvents();
 
         // render
-        glClearColor(0xFF, 0xFF, 0x00, 0xFF);
+        glClearColor(1.0, 1.0, 0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // swap buffer
