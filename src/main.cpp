@@ -67,15 +67,14 @@ int main(void)
     fragmentCode = (char*)malloc(FILE_READ_LENGTH);
     readFileData("glsl/vertex.glsl", vertexCode, FILE_READ_LENGTH);
     readFileData("glsl/fragment.glsl", fragmentCode, FILE_READ_LENGTH);
+    printf("vertex Code: \n%s\n", vertexCode);
+    printf("fragment Code: \n%s\n", fragmentCode);
     program = createProgram(vertexCode, fragmentCode);
     free(vertexCode);
     free(fragmentCode);
 
-    
-    // use program
-    glUseProgram(program);
+    // create VAO & VBO
     GLuint VAO, VBO;
-
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
@@ -83,13 +82,10 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 
-    GLuint posPos = glGetAttribLocation(program, "position");
-    glEnableVertexAttribArray(posPos);
-    glVertexAttribPointer(posPos, 3, GL_FLOAT, false, 3*sizeof(GL_FLOAT), NULL);
-    GLuint colPos = glGetUniformLocation(program, "color");
-    glUniform4f(colPos, 1.0, 0.5, 0, 1);
+    glBindVertexArray(0);
 
     // 游戏循环
+    // static int count = 0;
     glfwSetKeyCallback(window, close_callback);
     while (! glfwWindowShouldClose(window)) {
         
@@ -97,10 +93,21 @@ int main(void)
         glClearColor(1.0, 1.0, 0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-    // draw
-    glDrawArrays(GL_TRIANGLES, 0, 3);        
+        // use program
+        glUseProgram(program);
+        glBindVertexArray(VAO);
+        GLuint posPos = glGetAttribLocation(program, "position");
+        glEnableVertexAttribArray(posPos);
+        glVertexAttribPointer(posPos, 3, GL_FLOAT, false, 3*sizeof(GL_FLOAT), NULL);
+        GLuint colPos = glGetUniformLocation(program, "color");
+        glUniform4f(colPos, 1.0f, 0.5f, 0.1f, 1.0f);
+        
+        // draw
+        glDrawArrays(GL_TRIANGLES, 0, 3); 
 
-
+        // after
+        glDisableVertexAttribArray(posPos);
+        glBindVertexArray(0);
 
         // swap buffer
         glfwSwapBuffers(window);
@@ -108,6 +115,8 @@ int main(void)
         glfwPollEvents();
     }
     // delete program
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
     glDeleteProgram(program);
 
     // end
