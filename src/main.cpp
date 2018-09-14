@@ -72,35 +72,40 @@ int main(void)
     free(fragmentCode);
 
     
+    // use program
+    glUseProgram(program);
+    GLuint VAO, VBO;
 
-    // 游戏循环
-    glfwSetKeyCallback(window, close_callback);
-    while (! glfwWindowShouldClose(window)) {
-        // check events
-        glfwPollEvents();
-
-        // render
-        glClearColor(1.0, 1.0, 0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // use program
-        glUseProgram(program);
-    GLuint VBO;
+    glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 
     GLuint posPos = glGetAttribLocation(program, "position");
     glEnableVertexAttribArray(posPos);
-    glVertexAttribPointer(posPos, 3, GL_FLOAT, false, 3*sizeof(GL_FLOAT), vertex);
+    glVertexAttribPointer(posPos, 3, GL_FLOAT, false, 3*sizeof(GL_FLOAT), NULL);
     GLuint colPos = glGetUniformLocation(program, "color");
-    glUniform4f(colPos, 1.0, 0.5, 0, 1.0);
-        glDrawArrays(GL_TRIANGLES, 0, 3);        
+    glUniform4f(colPos, 1.0, 0.5, 0, 1);
+
+    // 游戏循环
+    glfwSetKeyCallback(window, close_callback);
+    while (! glfwWindowShouldClose(window)) {
+        
+        // render
+        glClearColor(1.0, 1.0, 0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+    // draw
+    glDrawArrays(GL_TRIANGLES, 0, 3);        
 
 
 
         // swap buffer
         glfwSwapBuffers(window);
+        // check events
+        glfwPollEvents();
     }
     // delete program
     glDeleteProgram(program);
