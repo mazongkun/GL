@@ -11,4 +11,7 @@ target_link_libraries(main
                       GLEW glfw3 
                       dl GL X11 
                       pthread Xrandr Xi
+		      Xxf86vm
+		      Xcursor
+		      Xinerama
                       )
