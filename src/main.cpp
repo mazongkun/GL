@@ -3,8 +3,8 @@
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
+// #include <glm/glm.hpp>
+// #include <glm/ext.hpp>
 //#include <GLFW/glfw3native.h>
 
 #include <stdio.h>
@@ -12,7 +12,10 @@
 #include "glUtils.hpp"
 #include "utils.hpp"
 
-using namespace glm;
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+// using namespace glm;
 
 const int FILE_READ_LENGTH = 256;
 
@@ -127,6 +130,24 @@ int main(void)
         // printf("now=%f, red=%f\n", now, red);
         GLuint colPos = glGetUniformLocation(program, "u_color");
         glUniform4f(colPos, red, 1.0f, 0.0f, 1.0f);
+
+        // texture
+        
+        // printf("texW=%d, texH=%d, texChannel=%d\n", texW, texH, texChannel);
+        GLuint tex2D;
+        glGenTextures(1, &tex2D);
+        glBindTexture(GL_TEXTURE_2D, tex2D);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        int texW, texH, texChannel;
+        unsigned char* texBuffer = stbi_load("../texture/tex.jpeg", &texW, &texH, &texChannel, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texW, texH, 0, GL_RGB, GL_UNSIGNED_BYTE, texBuffer);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(texBuffer);
         
         // draw
         // glDrawArrays(GL_TRIANGLES, 1, 3); 
@@ -134,6 +155,7 @@ int main(void)
 
         // after
         glDisableVertexAttribArray(posPos);
+        glDisableVertexAttribArray(posCol);
         glBindVertexArray(0);
 
         // swap buffer

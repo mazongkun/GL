@@ -9,6 +9,7 @@
 #define GLUTILS_HPP
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <GL/glew.h>
 
 int checkCompileResult(int shader) {
