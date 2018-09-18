@@ -65,8 +65,8 @@ int main(void)
     // create program
     vertexCode   = (char*)malloc(FILE_READ_LENGTH);
     fragmentCode = (char*)malloc(FILE_READ_LENGTH);
-    readFileData("glsl/vertex.glsl", vertexCode, FILE_READ_LENGTH);
-    readFileData("glsl/fragment.glsl", fragmentCode, FILE_READ_LENGTH);
+    readFileData("../glsl/vertex.glsl", vertexCode, FILE_READ_LENGTH);
+    readFileData("../glsl/fragment.glsl", fragmentCode, FILE_READ_LENGTH);
     printf("vertex Code: \n%s\n", vertexCode);
     printf("fragment Code: \n%s\n", fragmentCode);
     program = createProgram(vertexCode, fragmentCode);
