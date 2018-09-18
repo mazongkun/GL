@@ -15,11 +15,6 @@
 using namespace glm;
 
 const int FILE_READ_LENGTH = 256;
-const GLfloat vertex[] = {
-    -0.5f, 0.5f, 0,
-    -0.5f, -0.5f, 0,
-    0.5f, 0, 0
-};
 
 void close_callback(GLFWwindow * window, int key, int scanCode, int action, int mode) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -73,16 +68,36 @@ int main(void)
     free(vertexCode);
     free(fragmentCode);
 
+    const GLfloat vertex[] = {
+        -0.5f, 0.5f, 0,   1.0f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0,  0.5f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0,   0.0f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0,    0.0f, 0.5f, 1.0f
+    };
+    const int indices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+
     // create VAO & VBO
-    GLuint VAO, VBO;
+    GLuint VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
     glBindVertexArray(VAO);
-    
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glBindVertexArray(0);
+
+    // 获取支持的最大顶点数
+    // int n;
+    // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n);
+    // printf("n=%d\n", n);
 
     // 游戏循环
     // static int count = 0;
@@ -93,17 +108,29 @@ int main(void)
         glClearColor(1.0, 1.0, 0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // mode
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         // use program
         glUseProgram(program);
         glBindVertexArray(VAO);
-        GLuint posPos = glGetAttribLocation(program, "position");
+        GLuint posPos = glGetAttribLocation(program, "a_position");
         glEnableVertexAttribArray(posPos);
-        glVertexAttribPointer(posPos, 3, GL_FLOAT, false, 3*sizeof(GL_FLOAT), NULL);
-        GLuint colPos = glGetUniformLocation(program, "color");
-        glUniform4f(colPos, 1.0f, 0.5f, 0.1f, 1.0f);
+        glVertexAttribPointer(posPos, 3, GL_FLOAT, false, 6*sizeof(GL_FLOAT), 0);
+        GLuint posCol = glGetAttribLocation(program, "a_color");
+        glEnableVertexAttribArray(posCol);
+        glVertexAttribPointer(posCol, 3, GL_FLOAT, false, 6*sizeof(GL_FLOAT), (void*)(3*sizeof(GL_FLOAT)));
+
+        // color
+        float now = glfwGetTime();
+        float red = sin(now);
+        // printf("now=%f, red=%f\n", now, red);
+        GLuint colPos = glGetUniformLocation(program, "u_color");
+        glUniform4f(colPos, red, 1.0f, 0.0f, 1.0f);
         
         // draw
-        glDrawArrays(GL_TRIANGLES, 0, 3); 
+        // glDrawArrays(GL_TRIANGLES, 1, 3); 
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // after
         glDisableVertexAttribArray(posPos);
@@ -117,6 +144,7 @@ int main(void)
     // delete program
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
     glDeleteProgram(program);
 
     // end
