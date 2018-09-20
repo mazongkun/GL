@@ -17,7 +17,7 @@
 
 // using namespace glm;
 
-const int FILE_READ_LENGTH = 256;
+const int FILE_READ_LENGTH = 512;
 
 void close_callback(GLFWwindow * window, int key, int scanCode, int action, int mode) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -71,11 +71,13 @@ int main(void)
     free(vertexCode);
     free(fragmentCode);
 
+    const int VERTEX_STRIDE = 8;
     const GLfloat vertex[] = {
-        -0.5f, 0.5f, 0,   1.0f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0,  0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0,   0.0f, 0.5f, 0.0f,
-        0.5f, 0.5f, 0,    0.0f, 0.5f, 1.0f
+        // 顶点坐标         颜色                纹理坐标
+        -0.5f, 0.5f, 0,   1.0f, 0.5f, 0.0f,   0.0f,  2.0f,
+        -0.5f, -0.5f, 0,  0.5f, 0.5f, 0.0f,   0.0f,  0.0f,
+        0.5f, -0.5f, 0,   0.0f, 0.5f, 0.0f,   2.0f,  0.0f,
+        0.5f, 0.5f, 0,    0.0f, 0.5f, 1.0f,   2.0f,  2.0f
     };
     const int indices[] = {
         0, 1, 2,
@@ -119,10 +121,13 @@ int main(void)
         glBindVertexArray(VAO);
         GLuint posPos = glGetAttribLocation(program, "a_position");
         glEnableVertexAttribArray(posPos);
-        glVertexAttribPointer(posPos, 3, GL_FLOAT, false, 6*sizeof(GL_FLOAT), 0);
+        glVertexAttribPointer(posPos, 3, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), 0);
         GLuint posCol = glGetAttribLocation(program, "a_color");
         glEnableVertexAttribArray(posCol);
-        glVertexAttribPointer(posCol, 3, GL_FLOAT, false, 6*sizeof(GL_FLOAT), (void*)(3*sizeof(GL_FLOAT)));
+        glVertexAttribPointer(posCol, 3, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(3*sizeof(GL_FLOAT)));
+        GLuint posTexCoord = glGetAttribLocation(program, "a_texCoord");
+        glEnableVertexAttribArray(posTexCoord);
+        glVertexAttribPointer(posTexCoord, 2, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(6*sizeof(GL_FLOAT)));
 
         // color
         float now = glfwGetTime();
@@ -130,23 +135,25 @@ int main(void)
         // printf("now=%f, red=%f\n", now, red);
         GLuint colPos = glGetUniformLocation(program, "u_color");
         glUniform4f(colPos, red, 1.0f, 0.0f, 1.0f);
+        GLuint texPos = glGetUniformLocation(program, "u_texture");
+        glUniform1i(texPos, 0);
 
         // texture
-        
         // printf("texW=%d, texH=%d, texChannel=%d\n", texW, texH, texChannel);
         GLuint tex2D;
         glGenTextures(1, &tex2D);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex2D);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
         glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         int texW, texH, texChannel;
-        unsigned char* texBuffer = stbi_load("../texture/tex.jpeg", &texW, &texH, &texChannel, 0);
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char* texBuffer = stbi_load("../texture/rose.jpeg", &texW, &texH, &texChannel, 0);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texW, texH, 0, GL_RGB, GL_UNSIGNED_BYTE, texBuffer);
         glGenerateMipmap(GL_TEXTURE_2D);
-
         stbi_image_free(texBuffer);
         
         // draw
@@ -156,6 +163,7 @@ int main(void)
         // after
         glDisableVertexAttribArray(posPos);
         glDisableVertexAttribArray(posCol);
+        glDisableVertexAttribArray(posTexCoord);
         glBindVertexArray(0);
 
         // swap buffer
