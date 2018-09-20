@@ -76,8 +76,8 @@ int main(void)
         // 顶点坐标         颜色                纹理坐标
         -0.5f, 0.5f, 0,   1.0f, 0.5f, 0.0f,   0.0f,  2.0f,
         -0.5f, -0.5f, 0,  0.5f, 0.5f, 0.0f,   0.0f,  0.0f,
-        0.5f, -0.5f, 0,   0.0f, 0.5f, 0.0f,   2.0f,  0.0f,
-        0.5f, 0.5f, 0,    0.0f, 0.5f, 1.0f,   2.0f,  2.0f
+        0.5f, -0.5f, 0,   0.0f, 0.5f, 0.0f,   3.0f,  0.0f,
+        0.5f, 0.5f, 0,    0.0f, 0.5f, 1.0f,   3.0f,  2.0f
     };
     const int indices[] = {
         0, 1, 2,
@@ -137,6 +137,8 @@ int main(void)
         glUniform4f(colPos, red, 1.0f, 0.0f, 1.0f);
         GLuint texPos = glGetUniformLocation(program, "u_texture");
         glUniform1i(texPos, 0);
+        GLuint backTexPos = glGetUniformLocation(program, "u_back_texture");
+        glUniform1i(backTexPos, 1);
 
         // texture
         // printf("texW=%d, texH=%d, texChannel=%d\n", texW, texH, texChannel);
@@ -151,10 +153,26 @@ int main(void)
 
         int texW, texH, texChannel;
         stbi_set_flip_vertically_on_load(true);
-        unsigned char* texBuffer = stbi_load("../texture/rose.jpeg", &texW, &texH, &texChannel, 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texW, texH, 0, GL_RGB, GL_UNSIGNED_BYTE, texBuffer);
+        unsigned char* texBuffer = stbi_load("../texture/do.png", &texW, &texH, &texChannel, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texW, texH, 0, GL_RGBA, GL_UNSIGNED_BYTE, texBuffer);
         glGenerateMipmap(GL_TEXTURE_2D);
         stbi_image_free(texBuffer);
+        //background
+        GLuint backTex2D;
+        glGenTextures(1, &backTex2D);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, backTex2D);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        int backTexW, backTexH, backTexChannel;
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char* backTexBuffer = stbi_load("../texture/mo.jpg", &backTexW, &backTexH, &backTexChannel, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, backTexW, backTexH, 0, GL_RGB, GL_UNSIGNED_BYTE, backTexBuffer);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(backTexBuffer);
         
         // draw
         // glDrawArrays(GL_TRIANGLES, 1, 3); 
