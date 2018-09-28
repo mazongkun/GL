@@ -3,8 +3,8 @@
 #include <GL/glew.h>
 
 #include <GLFW/glfw3.h>
-// #include <glm/glm.hpp>
-// #include <glm/ext.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 //#include <GLFW/glfw3native.h>
 
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-// using namespace glm;
+using namespace glm;
 
 const int FILE_READ_LENGTH = 512;
 
@@ -108,7 +108,8 @@ int main(void)
     // static int count = 0;
     glfwSetKeyCallback(window, close_callback);
     while (! glfwWindowShouldClose(window)) {
-        
+        float now = glfwGetTime();
+
         // render
         glClearColor(1.0, 1.0, 0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -119,26 +120,49 @@ int main(void)
         // use program
         glUseProgram(program);
         glBindVertexArray(VAO);
-        GLuint posPos = glGetAttribLocation(program, "a_position");
-        glEnableVertexAttribArray(posPos);
-        glVertexAttribPointer(posPos, 3, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), 0);
-        GLuint posCol = glGetAttribLocation(program, "a_color");
-        glEnableVertexAttribArray(posCol);
-        glVertexAttribPointer(posCol, 3, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(3*sizeof(GL_FLOAT)));
-        GLuint posTexCoord = glGetAttribLocation(program, "a_texCoord");
-        glEnableVertexAttribArray(posTexCoord);
-        glVertexAttribPointer(posTexCoord, 2, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(6*sizeof(GL_FLOAT)));
+        GLuint loc_a_Pos = glGetAttribLocation(program, "a_position");
+        glEnableVertexAttribArray(loc_a_Pos);
+        glVertexAttribPointer(loc_a_Pos, 3, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), 0);
+        GLuint loc_a_Col = glGetAttribLocation(program, "a_color");
+        glEnableVertexAttribArray(loc_a_Col);
+        glVertexAttribPointer(loc_a_Col, 3, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(3*sizeof(GL_FLOAT)));
+        GLuint loc_a_TexCoord = glGetAttribLocation(program, "a_texCoord");
+        glEnableVertexAttribArray(loc_a_TexCoord);
+
+        // trans
+// vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+mat4 trans = mat4(1.0f);
+trans = translate(trans, vec3(0.5f, 0.5f, 0.0f));
+trans = rotate(trans, radians(now*10), vec3(0.0f, 0.0f, 1.0f));
+trans = scale(trans, vec3(1.5f, 0.5f, 2.0f));
+// vec = trans * vec;
+// printf("vec: %f, %f, %f\n", vec.x, vec.y, vec.z);
+
+        glVertexAttribPointer(loc_a_TexCoord, 2, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(6*sizeof(GL_FLOAT)));
+        GLuint loc_u_Transform = glGetUniformLocation(program, "u_transform");
+        glUniformMatrix4fv(loc_u_Transform, 1, false, value_ptr(trans));
+
+// model view projection
+mat4 matModel = mat4(1.0f);
+mat4 matView = mat4(1.0f);
+mat4 matProjection = mat4(1.0f);
+matModel = rotate(matModel, radians(now*10), vec3(1.0f, 0.0f, 0.0f));
+matView = translate(matView, vec3(0.0f, 0.0f, -3.0f));
+matProjection = perspective(45.0f, (float)width/height, 0.1f, 100.0f);
+
+        GLuint loc_u_Model = glGetUniformLocation(program, "u_model");
+        GLuint loc_u_View = glGetUniformLocation(program, "u_view");
+        GLuint loc_u_Proj = glGetUniformLocation(program, "u_projection");
 
         // color
-        float now = glfwGetTime();
         float red = sin(now);
         // printf("now=%f, red=%f\n", now, red);
-        GLuint colPos = glGetUniformLocation(program, "u_color");
-        glUniform4f(colPos, red, 1.0f, 0.0f, 1.0f);
-        GLuint texPos = glGetUniformLocation(program, "u_texture");
-        glUniform1i(texPos, 0);
-        GLuint backTexPos = glGetUniformLocation(program, "u_back_texture");
-        glUniform1i(backTexPos, 1);
+        GLuint loc_u_Col = glGetUniformLocation(program, "u_color");
+        glUniform4f(loc_u_Col, red, 1.0f, 0.0f, 1.0f);
+        GLuint loc_u_Tex = glGetUniformLocation(program, "u_texture");
+        glUniform1i(loc_u_Tex, 0);
+        GLuint loc_u_BackTex = glGetUniformLocation(program, "u_back_texture");
+        glUniform1i(loc_u_BackTex, 1);
 
         // texture
         // printf("texW=%d, texH=%d, texChannel=%d\n", texW, texH, texChannel);
@@ -146,10 +170,14 @@ int main(void)
         glGenTextures(1, &tex2D);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex2D);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         int texW, texH, texChannel;
         stbi_set_flip_vertically_on_load(true);
@@ -162,10 +190,14 @@ int main(void)
         glGenTextures(1, &backTex2D);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, backTex2D);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // glTextureParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         int backTexW, backTexH, backTexChannel;
         stbi_set_flip_vertically_on_load(true);
@@ -179,9 +211,9 @@ int main(void)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // after
-        glDisableVertexAttribArray(posPos);
-        glDisableVertexAttribArray(posCol);
-        glDisableVertexAttribArray(posTexCoord);
+        glDisableVertexAttribArray(loc_a_Pos);
+        glDisableVertexAttribArray(loc_a_Col);
+        glDisableVertexAttribArray(loc_a_TexCoord);
         glBindVertexArray(0);
 
         // swap buffer
