@@ -74,11 +74,55 @@ int main(void)
     const int VERTEX_STRIDE = 8;
     const GLfloat vertex[] = {
         // 顶点坐标         颜色                纹理坐标
-        -0.5f, 0.5f, 0,   1.0f, 0.5f, 0.0f,   0.0f,  2.0f,
-        -0.5f, -0.5f, 0,  0.5f, 0.5f, 0.0f,   0.0f,  0.0f,
-        0.5f, -0.5f, 0,   0.0f, 0.5f, 0.0f,   3.0f,  0.0f,
-        0.5f, 0.5f, 0,    0.0f, 0.5f, 1.0f,   3.0f,  2.0f
+        // -0.5f, 0.5f, 0,   1.0f, 0.5f, 0.0f,   0.0f,  2.0f,
+        // -0.5f, -0.5f, 0,  0.5f, 0.5f, 0.0f,   0.0f,  0.0f,
+        // 0.5f, -0.5f, 0,   0.0f, 0.5f, 0.0f,   3.0f,  0.0f,
+        // 0.5f, 0.5f, 0,    0.0f, 0.5f, 1.0f,   3.0f,  2.0f,
+
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.5f, 0.0f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  0.5f, 0.5f, 0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f, 0.5f, 0.0f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  0.0f, 0.5f, 1.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f, 0.0f, 0.5f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.5f, 1.0f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.5f, 1.0f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+
+        0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f
     };
+
+
     const int indices[] = {
         0, 1, 2,
         0, 2, 3
@@ -112,7 +156,7 @@ int main(void)
 
         // render
         glClearColor(1.0, 1.0, 0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // mode
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -128,6 +172,7 @@ int main(void)
         glVertexAttribPointer(loc_a_Col, 3, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(3*sizeof(GL_FLOAT)));
         GLuint loc_a_TexCoord = glGetAttribLocation(program, "a_texCoord");
         glEnableVertexAttribArray(loc_a_TexCoord);
+        glVertexAttribPointer(loc_a_TexCoord, 2, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(6*sizeof(GL_FLOAT)));
 
         // trans
 // vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
@@ -136,9 +181,7 @@ trans = translate(trans, vec3(0.5f, 0.5f, 0.0f));
 trans = rotate(trans, radians(now*10), vec3(0.0f, 0.0f, 1.0f));
 trans = scale(trans, vec3(1.5f, 0.5f, 2.0f));
 // vec = trans * vec;
-// printf("vec: %f, %f, %f\n", vec.x, vec.y, vec.z);
-
-        glVertexAttribPointer(loc_a_TexCoord, 2, GL_FLOAT, false, VERTEX_STRIDE*sizeof(GL_FLOAT), (void*)(6*sizeof(GL_FLOAT)));
+// printf("vec: %f, %f, %f\n", vec.x, vec.y, vec.z);        
         GLuint loc_u_Transform = glGetUniformLocation(program, "u_transform");
         glUniformMatrix4fv(loc_u_Transform, 1, false, value_ptr(trans));
 
@@ -153,6 +196,9 @@ matProjection = perspective(45.0f, (float)width/height, 0.1f, 100.0f);
         GLuint loc_u_Model = glGetUniformLocation(program, "u_model");
         GLuint loc_u_View = glGetUniformLocation(program, "u_view");
         GLuint loc_u_Proj = glGetUniformLocation(program, "u_projection");
+        glUniformMatrix4fv(loc_u_Model, 1, false, value_ptr(matModel));
+        glUniformMatrix4fv(loc_u_View, 1, false, value_ptr(matView));
+        glUniformMatrix4fv(loc_u_Proj, 1, false, value_ptr(matProjection));
 
         // color
         float red = sin(now);
@@ -208,7 +254,9 @@ matProjection = perspective(45.0f, (float)width/height, 0.1f, 100.0f);
         
         // draw
         // glDrawArrays(GL_TRIANGLES, 1, 3); 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glEnable(GL_DEPTH_TEST);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // after
         glDisableVertexAttribArray(loc_a_Pos);
