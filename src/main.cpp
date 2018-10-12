@@ -122,10 +122,22 @@ int main(void)
         -0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f
     };
 
-
     const int indices[] = {
         0, 1, 2,
         0, 2, 3
+    };
+
+    vec3 cubePositions[] = {
+        vec3( 0.0f,  0.0f,  0.0f), 
+        vec3( 2.0f,  5.0f, -15.0f), 
+        vec3(-1.5f, -2.2f, -2.5f),  
+        vec3(-3.8f, -2.0f, -12.3f),  
+        vec3( 2.4f, -0.4f, -3.5f),  
+        vec3(-1.7f,  3.0f, -7.5f),   
+        vec3( 1.3f, -2.0f, -2.5f),  
+        vec3( 1.5f,  2.0f, -2.5f), 
+        vec3( 1.5f,  0.2f, -1.5f), 
+        vec3(-1.3f,  1.0f, -1.5f)  
     };
 
     // create VAO & VBO
@@ -185,21 +197,6 @@ trans = scale(trans, vec3(1.5f, 0.5f, 2.0f));
         GLuint loc_u_Transform = glGetUniformLocation(program, "u_transform");
         glUniformMatrix4fv(loc_u_Transform, 1, false, value_ptr(trans));
 
-// model view projection
-mat4 matModel = mat4(1.0f);
-mat4 matView = mat4(1.0f);
-mat4 matProjection = mat4(1.0f);
-matModel = rotate(matModel, radians(now*10), vec3(1.0f, 0.0f, 0.0f));
-matView = translate(matView, vec3(0.0f, 0.0f, -3.0f));
-matProjection = perspective(45.0f, (float)width/height, 0.1f, 100.0f);
-
-        GLuint loc_u_Model = glGetUniformLocation(program, "u_model");
-        GLuint loc_u_View = glGetUniformLocation(program, "u_view");
-        GLuint loc_u_Proj = glGetUniformLocation(program, "u_projection");
-        glUniformMatrix4fv(loc_u_Model, 1, false, value_ptr(matModel));
-        glUniformMatrix4fv(loc_u_View, 1, false, value_ptr(matView));
-        glUniformMatrix4fv(loc_u_Proj, 1, false, value_ptr(matProjection));
-
         // color
         float red = sin(now);
         // printf("now=%f, red=%f\n", now, red);
@@ -255,7 +252,27 @@ matProjection = perspective(45.0f, (float)width/height, 0.1f, 100.0f);
         // draw
         // glDrawArrays(GL_TRIANGLES, 1, 3); 
         glEnable(GL_DEPTH_TEST);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+mat4 matProjection = mat4(1.0f);
+matProjection = perspective(45.0f, (float)width/height, 0.1f, 100.0f);
+mat4 matView = mat4(1.0f);
+matView = translate(matView, vec3(0.0f, 0.0f, -6.0f));
+// printf("sizeof(cubePositions)=%ld\n", sizeof(cubePositions));
+for (unsigned int i=0; i<10; i++) {
+    // model view projection
+    mat4 matModel = mat4(1.0f);
+    matModel = translate(matModel, cubePositions[i]);
+    matModel = rotate(matModel, radians((float)i*10), vec3(1.0f, 0.3f, 0.5f));
+    
+
+    GLuint loc_u_Model = glGetUniformLocation(program, "u_model");
+    GLuint loc_u_View = glGetUniformLocation(program, "u_view");
+    GLuint loc_u_Proj = glGetUniformLocation(program, "u_projection");
+    glUniformMatrix4fv(loc_u_Model, 1, false, value_ptr(matModel));
+    glUniformMatrix4fv(loc_u_View, 1, false, value_ptr(matView));
+    glUniformMatrix4fv(loc_u_Proj, 1, false, value_ptr(matProjection));
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+}
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // after
