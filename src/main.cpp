@@ -256,7 +256,17 @@ trans = scale(trans, vec3(1.5f, 0.5f, 2.0f));
 mat4 matProjection = mat4(1.0f);
 matProjection = perspective(45.0f, (float)width/height, 0.1f, 100.0f);
 mat4 matView = mat4(1.0f);
-matView = translate(matView, vec3(0.0f, 0.0f, -6.0f));
+// matView = translate(matView, vec3(0.0f, 0.0f, -6.0f));
+float radius = 6.0f;
+float camX = radius * sin(now);
+float camZ = radius * cos(now);
+// if (camX < 0) camY = -camY;
+// camX = abs(camX);
+
+
+matView = lookAt(vec3(camX, camZ, 0.0f ), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 1.0f));
+printf("%f, %f, %f\n", radius, camX, camZ);
+
 // printf("sizeof(cubePositions)=%ld\n", sizeof(cubePositions));
 for (unsigned int i=0; i<10; i++) {
     // model view projection
